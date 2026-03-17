@@ -274,12 +274,12 @@ func (t *Table[T]) Insert(data T) (T, error) {
 	return t.InsertOne(data)
 }
 
-// ToColumns converts one typed model to a raw column-value map.
+// ToData converts one typed model to a raw column-value map.
 //
 // Notes:
 // - Keys are DB column names resolved from `db` tags or snake_case field names.
 // - Output is filtered to table-defined columns for safety.
-func (t *Table[T]) ToColumns(data T) (map[string]any, error) {
+func (t *Table[T]) ToColumnData(data T) (map[string]any, error) {
 	valuesMap, err := mapper.StructToMap(data)
 	if err != nil {
 		return nil, err
@@ -287,37 +287,17 @@ func (t *Table[T]) ToColumns(data T) (map[string]any, error) {
 	return t.filterAllowed(valuesMap), nil
 }
 
-// ToColumnsList converts multiple typed models to raw column-value maps.
-func (t *Table[T]) ToColumnsList(data []T) ([]map[string]any, error) {
+// ToColumnDataList converts multiple typed models to raw column-value maps.
+func (t *Table[T]) ToColumnDataList(data []T) ([]map[string]any, error) {
 	out := make([]map[string]any, 0, len(data))
 	for _, item := range data {
-		row, err := t.ToColumns(item)
+		row, err := t.ToColumnData(item)
 		if err != nil {
 			return nil, err
 		}
 		out = append(out, row)
 	}
 	return out, nil
-}
-
-// ToValues is a backward-compatible alias for ToColumns.
-func (t *Table[T]) ToValues(data T) (map[string]any, error) {
-	return t.ToColumns(data)
-}
-
-// ToValuesList is a backward-compatible alias for ToColumnsList.
-func (t *Table[T]) ToValuesList(data []T) ([]map[string]any, error) {
-	return t.ToColumnsList(data)
-}
-
-// RawData is an alias of ToColumns for a more response-oriented naming style.
-func (t *Table[T]) RawData(data T) (map[string]any, error) {
-	return t.ToColumns(data)
-}
-
-// RawDataList is an alias of ToColumnsList.
-func (t *Table[T]) RawDataList(data []T) ([]map[string]any, error) {
-	return t.ToColumnsList(data)
 }
 
 // FetchOne returns one typed row matching where conditions.
