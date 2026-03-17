@@ -1,4 +1,4 @@
-module pggo
+module github.com/AdnanBinPulok/pggo
 
 go 1.25.1
 

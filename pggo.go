@@ -1,9 +1,9 @@
 package pggo
 
 import (
-	"pggo/connection"
-	"pggo/query"
-	"pggo/schema"
+	"github.com/AdnanBinPulok/pggo/connection"
+	"github.com/AdnanBinPulok/pggo/query"
+	"github.com/AdnanBinPulok/pggo/schema"
 )
 
 // DatabaseConnection is the shared PostgreSQL pool wrapper used by all tables.

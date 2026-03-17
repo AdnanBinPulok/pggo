@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"pggo/cache"
-	"pggo/connection"
-	"pggo/internal"
-	"pggo/mapper"
-	"pggo/query"
+	"github.com/AdnanBinPulok/pggo/cache"
+	"github.com/AdnanBinPulok/pggo/connection"
+	"github.com/AdnanBinPulok/pggo/internal"
+	"github.com/AdnanBinPulok/pggo/mapper"
+	"github.com/AdnanBinPulok/pggo/query"
 
 	"github.com/jackc/pgx/v5"
 )

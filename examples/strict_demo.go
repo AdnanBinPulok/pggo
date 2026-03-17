@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"pggo"
 	"time"
+
+	"github.com/AdnanBinPulok/pggo"
 )
 
 // User is the demo model mapped to users table.
