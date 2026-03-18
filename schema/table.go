@@ -701,12 +701,24 @@ func (t *Table[T]) filterInsertable(values map[string]any) map[string]any {
 		if !ok {
 			continue
 		}
+		if v == nil && columnHasDefault(c) {
+			continue
+		}
 		if shouldSkipAutoColumn(c, v) {
 			continue
 		}
 		out[c.Name] = v
 	}
 	return out
+}
+
+func columnHasDefault(column Column) bool {
+	for _, c := range column.DataType.Constraints {
+		if strings.HasPrefix(strings.ToUpper(strings.TrimSpace(c)), "DEFAULT ") {
+			return true
+		}
+	}
+	return false
 }
 
 func shouldSkipAutoColumn(column Column, value any) bool {
