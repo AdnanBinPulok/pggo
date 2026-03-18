@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -40,9 +41,40 @@ func (c *DatabaseConnection) Pool() (*pgxpool.Pool, error) {
 	return c.Connect()
 }
 
+// RunQuery executes a SQL query and returns rows as column-value maps.
+func (c *DatabaseConnection) RunQuery(queryString string, params []any) ([]map[string]any, error) {
+	pool, err := c.Pool()
+	if err != nil {
+		return nil, err
+	}
+	rows, err := pool.Query(context.Background(), queryString, params...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanRowsToMaps(rows)
+}
+
 // Close closes the underlying pool.
 func (c *DatabaseConnection) Close() {
 	if c.pool != nil {
 		c.pool.Close()
 	}
+}
+
+func scanRowsToMaps(rows pgx.Rows) ([]map[string]any, error) {
+	result := []map[string]any{}
+	fields := rows.FieldDescriptions()
+	for rows.Next() {
+		vals, err := rows.Values()
+		if err != nil {
+			return nil, err
+		}
+		row := map[string]any{}
+		for i, f := range fields {
+			row[string(f.Name)] = vals[i]
+		}
+		result = append(result, row)
+	}
+	return result, rows.Err()
 }
