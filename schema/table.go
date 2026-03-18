@@ -701,7 +701,7 @@ func (t *Table[T]) filterInsertable(values map[string]any) map[string]any {
 		if !ok {
 			continue
 		}
-		if v == nil && columnHasDefault(c) {
+		if columnHasDefault(c) && isNilValue(v) {
 			continue
 		}
 		if shouldSkipAutoColumn(c, v) {
@@ -719,6 +719,19 @@ func columnHasDefault(column Column) bool {
 		}
 	}
 	return false
+}
+
+func isNilValue(value any) bool {
+	if value == nil {
+		return true
+	}
+	rv := reflect.ValueOf(value)
+	switch rv.Kind() {
+	case reflect.Ptr, reflect.Interface, reflect.Map, reflect.Slice, reflect.Func:
+		return rv.IsNil()
+	default:
+		return false
+	}
 }
 
 func shouldSkipAutoColumn(column Column, value any) bool {
