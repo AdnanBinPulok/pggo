@@ -17,6 +17,23 @@ func CastAssign(dst reflect.Value, src any) error {
 		return nil
 	}
 
+	// Handle pointer targets (including *time.Time) explicitly before generic assigns.
+	if dst.Kind() == reflect.Ptr {
+		sv := reflect.ValueOf(src)
+		// If the source is a pointer and assignable, set directly.
+		if sv.Type().AssignableTo(dst.Type()) {
+			dst.Set(sv)
+			return nil
+		}
+		// If the source can be assigned to the pointer element, allocate and set.
+		if sv.Type().AssignableTo(dst.Type().Elem()) {
+			newVal := reflect.New(dst.Type().Elem())
+			newVal.Elem().Set(sv)
+			dst.Set(newVal)
+			return nil
+		}
+	}
+
 	sv := reflect.ValueOf(src)
 	if sv.Type().AssignableTo(dst.Type()) {
 		dst.Set(sv)
@@ -38,6 +55,12 @@ func CastAssign(dst reflect.Value, src any) error {
 	if dst.Type() == reflect.TypeOf(time.Time{}) {
 		if t, ok := src.(time.Time); ok {
 			dst.Set(reflect.ValueOf(t))
+			return nil
+		}
+	}
+	if dst.Type() == reflect.TypeOf(&time.Time{}) {
+		if t, ok := src.(time.Time); ok {
+			dst.Set(reflect.ValueOf(&t))
 			return nil
 		}
 	}
